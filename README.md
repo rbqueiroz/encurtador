@@ -33,6 +33,7 @@ Para encurtar um link, basta fazer uma requisição POST para `http://localhost:
 ```
 A resposta será um JSON com o link encurtado:
 ```json
+{    
     "id": 1,
     "urlOriginal": "https://www.google.com/search?sca_esv=9a193cf2d9170f88&rlz=1C1CHBD_enBR1112BR1112&sxsrf=ADLYWILWnAUY3XUZ_Md40eUtYWxH9GT54g:1736629657807&q=img&udm=2&fbs=AEQNm0B-n-O0Tl8kahCw8A1QEw8Mict6JzQlWiIWxntiM9v91yTdNMM8xiGhoawYbNd1fihFlhcM5iZxkxWpvXM_7MtxDj88GJ9eiAAhVkgF-e17fGH2Kb1O8JVBkb_JCrgYSsPNm99pqtSdWcg0N3-o_A6AXusIHEnNnP_vGteGsF44iSeyPYGtri9ayuVIKIyA4L_XSZQNhhS4IjFrMqaegME0cTF8rg&sa=X&ved=2ahUKEwiesfDOye6KAxU0LLkGHbe0F8QQtKgLegQIEhAB&biw=1894&bih=1011&dpr=0.9#vhid=CtwY8PRdZ4CA8M&vssid=mosaic",
     "urlCurta": "http://localhost:8080/aHR0cH",
