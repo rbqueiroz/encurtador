@@ -1,0 +1,51 @@
+name: Docker Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+
+  vpn-setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install OpenVPN
+        run: sudo apt-get install -y openvpn
+
+      - name: Save VPN Configuration
+        run: echo "${{ secrets.VPN_CONFIG }}" > vpn-config.ovpn
+
+      - name: Connect to VPN
+        run: |
+          sudo openvpn --config vpn-config.ovpn &
+          sleep 30
+          # Verifica a conexão VPN
+          if ! ip a | grep -q "tun0"; then
+            echo "VPN connection failed"
+            exit 1
+          fi
+
+      - name: SSH and clone repository
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.VPS_USERNAME }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          script: |
+            docker stop encurtador
+            docker rm -f encurtador
+            rm -rf encurtador
+            git clone https://${{ secrets.GIT_KEY }}@github.com/rbqueiroz/encurtador.git
+            cd encurtador
+            docker build -t encurtador .
+            docker run -d -p 8085:8080 --name encurtador -e DB_URL=${{ secrets.DB_URL }} -e DB_USER=${{ secrets.DB_USER }} -e DB_PASS=${{ secrets.DB_PASS }} -e ambiente=${{ secrets.ANBIENTE }} encurtador
+            cd ..
+            rm -rf encurtador
+
+      - name: Disconnect VPN
+        run: sudo killall openvpn
