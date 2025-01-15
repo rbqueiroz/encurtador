@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/")
@@ -30,5 +31,10 @@ public class UrlMappingController {
         return service.getUrlOriginal(urlCurta)
                 .map(url -> ResponseEntity.status(302).location(URI.create(url)).build())
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/listar")
+    public ResponseEntity<List<UrlMapping>> listAll() {
+        return ResponseEntity.ok(service.getListAll());
     }
 }

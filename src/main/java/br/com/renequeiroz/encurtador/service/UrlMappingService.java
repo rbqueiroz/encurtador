@@ -4,14 +4,13 @@ import br.com.renequeiroz.encurtador.dto.UrlMappingDTO;
 import br.com.renequeiroz.encurtador.exceptions.MensagemGeralException;
 import br.com.renequeiroz.encurtador.model.UrlMapping;
 import br.com.renequeiroz.encurtador.repository.UrlMappingRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Base64;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
 
 @Service
@@ -19,6 +18,8 @@ public class UrlMappingService {
 
     @Value("${app.base-url}")
     private String baseUrl;
+
+    private final Logger log = LoggerFactory.getLogger(UrlMappingService.class);
 
     private final UrlMappingRepository repository;
 
@@ -61,8 +62,29 @@ public class UrlMappingService {
     }
 
     private String gerarUrlCurta(String urlOriginal) {
-        String urlCurta = Base64.getUrlEncoder().withoutPadding().encodeToString(urlOriginal.getBytes()).substring(0, 6);
+        String urlCurtaBase64 = Base64.getUrlEncoder().withoutPadding().encodeToString(urlOriginal.getBytes());
+        int tamanho = urlCurtaBase64.length();
+        String urlCurta = urlCurtaBase64.substring(Math.max(tamanho - 6, 0));
         return getUrl(urlCurta);
+    }
+
+    public List<UrlMapping> getListAll() {
+        List<UrlMapping> listUrlMappings = repository.findAll();
+        List<UrlMapping> urlMappings = new ArrayList<>();
+
+        for (UrlMapping urlMapping : listUrlMappings) {
+            UrlMapping novo = UrlMapping.builder()
+                    .id(urlMapping.getId())
+                    .urlCurta(urlMapping.getUrlCurta())
+                    .urlOriginal(urlMapping.getUrlOriginal())
+                    .descricao(urlMapping.getDescricao())
+                    .qtdAcessos(urlMapping.getQtdAcessos())
+                    .dataCadastro(urlMapping.getDataCadastro())
+                    .expirationDate(urlMapping.getExpirationDate())
+                    .build();
+            urlMappings.add(novo);
+        }
+        return urlMappings;
     }
 
     public Optional<String> getUrlOriginal(String url) {
