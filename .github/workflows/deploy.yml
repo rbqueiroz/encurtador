@@ -22,12 +22,22 @@ jobs:
       - name: Connect to VPN
         run: |
           sudo openvpn --config vpn-config.ovpn &
-          sleep 30
+
           # Verifica a conexão VPN
+          for i in {1..10}; do
+            if ip a | grep -q "tun0"; then
+              echo "VPN connected"
+              break
+            fi
+            echo "Waiting for VPN connection... Attempt $i"
+            sleep 10
+          done
+
           if ! ip a | grep -q "tun0"; then
             echo "VPN connection failed"
             exit 1
           fi
+      
 
       - name: SSH and clone repository
         uses: appleboy/ssh-action@master
@@ -48,4 +58,5 @@ jobs:
             rm -rf encurtador
 
       - name: Disconnect VPN
-        run: sudo killall openvpn
+        run: |
+          sudo pkill -f "openvpn --config vpn-config.ovpn"
