@@ -1,7 +1,9 @@
 package br.com.renequeiroz.encurtador.config;
 
+import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -26,9 +28,19 @@ public class OpenAPIConfig {
 
         return new OpenAPI()
                 .info(new Info()
-                        .title("API Encurtador de URL")
-                        .version("v1.0")
-                        .description("Documentação da API"))
+                        .title("Encurta URL API")
+                        .description("Encurtador de url.")
+                        .version("1.0.0")
+                        .termsOfService("Termo de uso: Open Source")
+                        .license(new License()
+                                .name("Apache 2.0")
+                                .url("http://appdisponivel.com.br")
+                        )
+                                ).externalDocs(
+                        new ExternalDocumentation()
+                                .description("Rene Queiroz")
+                                .url("https://renequeiroz.com.br"))
                 .servers(List.of(productionServer));
-    }
+        }
 }
+
