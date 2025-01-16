@@ -1,10 +1,10 @@
-FROM maven:3.6.3-openjdk-17 as build
-COPY pom.xml /build/
-COPY src /build/src/
+FROM maven:3.6.3-openjdk-17 AS build
 WORKDIR /build/
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+COPY src ./src/
 RUN mvn clean package -DskipTests
-
-FROM openjdk:17-jdk-slim
-WORKDIR /app
-COPY --from=build /build/target/*.jar /app/encurtador.jar
+FROM openjdk:17-slim
+WORKDIR /app/
+COPY --from=build /build/target/*.jar encurtador.jar
 CMD ["java", "-jar", "encurtador.jar"]
