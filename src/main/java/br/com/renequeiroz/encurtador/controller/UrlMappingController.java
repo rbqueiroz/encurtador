@@ -1,5 +1,6 @@
 package br.com.renequeiroz.encurtador.controller;
 
+import br.com.renequeiroz.encurtador.dto.MensagemDTO;
 import br.com.renequeiroz.encurtador.dto.UrlMappingDTO;
 import br.com.renequeiroz.encurtador.model.UrlMapping;
 import br.com.renequeiroz.encurtador.service.UrlMappingService;
@@ -36,5 +37,10 @@ public class UrlMappingController {
     @GetMapping("/listar")
     public ResponseEntity<List<UrlMapping>> listAll() {
         return ResponseEntity.ok(service.getListAll());
+    }
+
+    @DeleteMapping("/deletar/{id}")
+    public ResponseEntity<MensagemDTO> delete(@PathVariable Long id) {
+        return ResponseEntity.ok(service.deleteLink(id));
     }
 }
