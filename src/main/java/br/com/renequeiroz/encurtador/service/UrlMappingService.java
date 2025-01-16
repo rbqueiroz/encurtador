@@ -1,12 +1,16 @@
 package br.com.renequeiroz.encurtador.service;
 
+import br.com.renequeiroz.encurtador.dto.MensagemDTO;
 import br.com.renequeiroz.encurtador.dto.UrlMappingDTO;
+import br.com.renequeiroz.encurtador.enums.Mensagens;
 import br.com.renequeiroz.encurtador.exceptions.MensagemGeralException;
 import br.com.renequeiroz.encurtador.model.UrlMapping;
 import br.com.renequeiroz.encurtador.repository.UrlMappingRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -90,7 +94,7 @@ public class UrlMappingService {
     public Optional<String> getUrlOriginal(String url) {
         UrlMapping urlCurta = repository.findByUrlCurta(getUrl(url));
         if (urlCurta == null) {
-            throw new MensagemGeralException("URL não encontrada");
+            throw new MensagemGeralException(Mensagens.URL_NAO_ENCONTRADA.getMensagem());
         }
         verificarDataExpiracao(urlCurta);
         setAcessos(urlCurta);
@@ -100,7 +104,7 @@ public class UrlMappingService {
     private void verificarDataExpiracao(UrlMapping urlMapping) {
         if (urlMapping.getExpirationDate().before(new Date())) {
             deletarUrl(urlMapping);
-            throw new MensagemGeralException("URL expirada");
+            throw new MensagemGeralException(Mensagens.URL_EXPIRADA.getMensagem());
         }
     }
 
@@ -115,5 +119,11 @@ public class UrlMappingService {
         calendar.setTime(dataCadastro);
         calendar.add(Calendar.DAY_OF_YEAR, dias);
         return calendar.getTime();
+    }
+
+    public MensagemDTO deleteLink(Long id) {
+        UrlMapping urlMapping  = repository.findById(id).orElseThrow(() -> new MensagemGeralException(Mensagens.URL_NAO_ENCONTRADA.getMensagem()));
+        deletarUrl(urlMapping);
+        return new MensagemDTO(HttpStatus.valueOf(200), Mensagens.URL_DELETADA.getMensagem());
     }
 }
