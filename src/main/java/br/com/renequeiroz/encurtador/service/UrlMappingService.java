@@ -1,17 +1,20 @@
 package br.com.renequeiroz.encurtador.service;
 
+import br.com.renequeiroz.encurtador.dto.MensagemDTO;
 import br.com.renequeiroz.encurtador.dto.UrlMappingDTO;
+import br.com.renequeiroz.encurtador.enums.Mensagens;
 import br.com.renequeiroz.encurtador.exceptions.MensagemGeralException;
 import br.com.renequeiroz.encurtador.model.UrlMapping;
 import br.com.renequeiroz.encurtador.repository.UrlMappingRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Base64;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
 
 @Service
@@ -19,6 +22,8 @@ public class UrlMappingService {
 
     @Value("${app.base-url}")
     private String baseUrl;
+
+    private final Logger log = LoggerFactory.getLogger(UrlMappingService.class);
 
     private final UrlMappingRepository repository;
 
@@ -61,14 +66,35 @@ public class UrlMappingService {
     }
 
     private String gerarUrlCurta(String urlOriginal) {
-        String urlCurta = Base64.getUrlEncoder().withoutPadding().encodeToString(urlOriginal.getBytes()).substring(0, 6);
+        String urlCurtaBase64 = Base64.getUrlEncoder().withoutPadding().encodeToString(urlOriginal.getBytes());
+        int tamanho = urlCurtaBase64.length();
+        String urlCurta = urlCurtaBase64.substring(Math.max(tamanho - 6, 0));
         return getUrl(urlCurta);
+    }
+
+    public List<UrlMapping> getListAll() {
+        List<UrlMapping> listUrlMappings = repository.findAll();
+        List<UrlMapping> urlMappings = new ArrayList<>();
+
+        for (UrlMapping urlMapping : listUrlMappings) {
+            UrlMapping novo = UrlMapping.builder()
+                    .id(urlMapping.getId())
+                    .urlCurta(urlMapping.getUrlCurta())
+                    .urlOriginal(urlMapping.getUrlOriginal())
+                    .descricao(urlMapping.getDescricao())
+                    .qtdAcessos(urlMapping.getQtdAcessos())
+                    .dataCadastro(urlMapping.getDataCadastro())
+                    .expirationDate(urlMapping.getExpirationDate())
+                    .build();
+            urlMappings.add(novo);
+        }
+        return urlMappings;
     }
 
     public Optional<String> getUrlOriginal(String url) {
         UrlMapping urlCurta = repository.findByUrlCurta(getUrl(url));
         if (urlCurta == null) {
-            throw new MensagemGeralException("URL não encontrada");
+            throw new MensagemGeralException(Mensagens.URL_NAO_ENCONTRADA.getMensagem());
         }
         verificarDataExpiracao(urlCurta);
         setAcessos(urlCurta);
@@ -78,7 +104,7 @@ public class UrlMappingService {
     private void verificarDataExpiracao(UrlMapping urlMapping) {
         if (urlMapping.getExpirationDate().before(new Date())) {
             deletarUrl(urlMapping);
-            throw new MensagemGeralException("URL expirada");
+            throw new MensagemGeralException(Mensagens.URL_EXPIRADA.getMensagem());
         }
     }
 
@@ -93,5 +119,11 @@ public class UrlMappingService {
         calendar.setTime(dataCadastro);
         calendar.add(Calendar.DAY_OF_YEAR, dias);
         return calendar.getTime();
+    }
+
+    public MensagemDTO deleteLink(Long id) {
+        UrlMapping urlMapping  = repository.findById(id).orElseThrow(() -> new MensagemGeralException(Mensagens.URL_NAO_ENCONTRADA.getMensagem()));
+        deletarUrl(urlMapping);
+        return new MensagemDTO(HttpStatus.valueOf(200), Mensagens.URL_DELETADA.getMensagem());
     }
 }

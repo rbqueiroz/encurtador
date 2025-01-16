@@ -5,8 +5,8 @@ Este projeto é um encurtador de links, que tem como objetivo encurtar links gra
 - Encurtar links via API
 - Redirecionar links encurtados via API
 - Listar links encurtados via API
-- Deletar links expirados por validação de tempo
-- Estatísticas de acesso
+- Deletar links via API
+- Estatísticas de acesso aos links encurtados via API
 
 ## Tecnologias
 - Java 17
@@ -43,3 +43,10 @@ A resposta será um JSON com o link encurtado:
     "qtdAcessos": 0
 }
 ```
+
+### Redirecionar link
+Para redirecionar um link encurtado, basta fazer uma requisição GET para `http://localhost:8080/aHR0cH`. O redirecionamento será feito para a URL original.
+
+### Listar links encurtados
+Para listar os links encurtados, basta fazer uma requisição GET para `http://localhost:8080/listar`. A resposta será uma lista de links encurtados.
+
