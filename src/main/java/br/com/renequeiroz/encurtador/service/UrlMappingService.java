@@ -122,7 +122,7 @@ public class UrlMappingService {
     }
 
     public MensagemDTO deleteLink(Long id) {
-        UrlMapping urlMapping = repository.findById(id).orElseThrow(() -> new MensagemGeralException(Mensagens.URL_NAO_ENCONTRADA.getMensagem()));
+        UrlMapping urlMapping  = repository.findById(id).orElseThrow(() -> new MensagemGeralException(Mensagens.URL_NAO_ENCONTRADA.getMensagem()));
         deletarUrl(urlMapping);
         return new MensagemDTO(HttpStatus.valueOf(200), Mensagens.URL_DELETADA.getMensagem());
     }
