@@ -5,6 +5,7 @@ Este projeto é um encurtador de links, que tem como objetivo encurtar links gra
 - Encurtar links via API
 - Redirecionar links encurtados via API
 - Listar links encurtados via API
+- Deletar links expirados por validação de tempo
 - Deletar links via API
 - Estatísticas de acesso aos links encurtados via API
 
@@ -50,3 +51,5 @@ Para redirecionar um link encurtado, basta fazer uma requisição GET para `http
 ### Listar links encurtados
 Para listar os links encurtados, basta fazer uma requisição GET para `http://localhost:8080/listar`. A resposta será uma lista de links encurtados.
 
+### Deletar link
+Para deletar um link encurtado, basta fazer uma requisição DELETE para `http://localhost:8080/1`, onde `1` é o id do link encurtado.
