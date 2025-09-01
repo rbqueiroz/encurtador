@@ -50,3 +50,6 @@ Para redirecionar um link encurtado, basta fazer uma requisição GET para `http
 ### Listar links encurtados
 Para listar os links encurtados, basta fazer uma requisição GET para `http://localhost:8080/listar`. A resposta será uma lista de links encurtados.
 
+
+
+<!-- Security scan triggered at 2025-09-02 01:13:20 -->
