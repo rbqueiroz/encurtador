@@ -53,3 +53,5 @@ Para listar os links encurtados, basta fazer uma requisição GET para `http://l
 
 
 <!-- Security scan triggered at 2025-09-02 01:13:20 -->
+
+<!-- Security scan triggered at 2025-09-09 05:30:00 -->
